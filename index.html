@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Калькулятор окупаемости СЭС + BESS</title>
+    <script>
+        function calculateROI() {
+            let powerDC = parseFloat(document.getElementById('powerDC').value) || 0;
+            let powerAC = parseFloat(document.getElementById('powerAC').value) || 0;
+            let costFES = parseFloat(document.getElementById('costFES').value) || 0;
+            let generationPerKW = parseFloat(document.getElementById('generationPerKW').value) || 0;
+            let annualGeneration = powerDC * generationPerKW;
+            let tariffDay = parseFloat(document.getElementById('tariffDay').value) || 0;
+            let bessPower = parseFloat(document.getElementById('bessPower').value) || 0;
+            let bessCapacity = parseFloat(document.getElementById('bessCapacity').value) || 0;
+            let bessEfficiency = parseFloat(document.getElementById('bessEfficiency').value) || 0;
+            let costBESS = parseFloat(document.getElementById('costBESS').value) || 0;
+            let tariffNight = parseFloat(document.getElementById('tariffNight').value) || 0;
+            let bessUsagePercent = parseFloat(document.getElementById('bessUsagePercent').value) || 0;
+            
+            let incomeDay = annualGeneration * tariffDay;
+            let bessEnergyStored = annualGeneration * (bessUsagePercent / 100);
+            let bessEnergyDischarged = bessEnergyStored * (bessEfficiency / 100);
+            let incomeNight = bessEnergyDischarged * tariffNight;
+            let fixedEnergyBESS = bessEnergyStored;
+            let netProfitBESS = incomeNight - (fixedEnergyBESS * tariffDay);
+            let paybackBESS = netProfitBESS > 0 ? costBESS / netProfitBESS : '∞';
+            let totalIncome = incomeDay + incomeNight;
+            let incomeIncreasePercent = ((incomeNight / incomeDay) * 100).toFixed(2);
+            let incomeIncreaseTotalPercent = ((incomeNight / totalIncome) * 100).toFixed(2);
+            
+            document.getElementById('result').innerHTML = "<b>Годовая генерация ФЭС:</b> " + annualGeneration.toFixed(2) + " кВт·ч/год<br>" +
+                "<b>Доход от продажи днём ФЭС:</b> " + incomeDay.toFixed(2) + " евро/год<br>" +
+                "<b>Доход от продажи ночью от BESS:</b> " + incomeNight.toFixed(2) + " евро/год<br>" +
+                "<b>Фиксация электроэнергии в BESS:</b> " + fixedEnergyBESS.toFixed(2) + " кВт·ч/год<br>" +
+                "<b>Чистая прибыль от BESS:</b> " + netProfitBESS.toFixed(2) + " евро/год<br>" +
+                "<b>Срок окупаемости BESS:</b> " + paybackBESS + " лет<br>" +
+                "<b>% прироста дохода при установке BESS:</b> " + incomeIncreasePercent + " %<br>" +
+                "<b>% прироста дохода от BESS к полной генерации ФЭС:</b> " + incomeIncreaseTotalPercent + " %";
+        }
+    </script>
+</head>
+<body>
+    <h2>Калькулятор окупаемости СЭС + BESS</h2>
+    <label>Мощность станции DC (кВт):</label>
+    <input type="number" id="powerDC" value="6240">
+    <br>
+    <label>Мощность станции AC (кВт):</label>
+    <input type="number" id="powerAC" value="4950">
+    <br>
+    <label>Стоимость ФЭС (€):</label>
+    <input type="number" id="costFES" value="2482617.94">
+    <br>
+    <label>Годовая генерация ФЭС (кВт·ч на 1 кВт DC):</label>
+    <input type="number" id="generationPerKW" value="1400">
+    <br>
+    <label>Тариф дневной (€/кВт·ч):</label>
+    <input type="number" id="tariffDay" value="0.071">
+    <br>
+    <label>Мощность BESS (МВт):</label>
+    <input type="number" id="bessPower" value="5">
+    <br>
+    <label>Ёмкость BESS (МВт·ч):</label>
+    <input type="number" id="bessCapacity" value="10.02">
+    <br>
+    <label>КПД BESS (%):</label>
+    <input type="number" id="bessEfficiency" value="90">
+    <br>
+    <label>Стоимость BESS (€):</label>
+    <input type="number" id="costBESS" value="1812277.61">
+    <br>
+    <label>Тариф ночной (€/кВт·ч):</label>
+    <input type="number" id="tariffNight" value="0.154">
+    <br>
+    <label>% генерации ФЭС, используемой для BESS:</label>
+    <input type="number" id="bessUsagePercent" value="40">
+    <br>
+    <button onclick="calculateROI()">Рассчитать</button>
+    <h3>Результаты:</h3>
+    <div id="result"></div>
+</body>
+</html>
